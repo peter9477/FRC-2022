@@ -12,15 +12,20 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class ShooterSubsystem extends SubsystemBase {
   private final CANSparkMax m_shooterMotor;
   private final CANSparkMax m_feederMotor;
+  private final CANSparkMax m_winchMotor;
+  // ADD ENCODER FOR CHANGING WINCH ANGLE
 
   private double m_shootPow = 0;
   private double m_feedPow = 0;
+  private double m_winchAngle = 0;
 
   /** Creates a new ShooterSubsystem. */
-  public ShooterSubsystem(int shooterMotor, int feederMotor) {
+  public ShooterSubsystem(int shooterMotor, int feederMotor, int winchMotor) {
     m_shooterMotor = new CANSparkMax(shooterMotor, MotorType.kBrushed);
 
     m_feederMotor = new CANSparkMax(feederMotor, MotorType.kBrushless);
+
+    m_winchMotor = new CANSparkMax(winchMotor, MotorType.kBrushless);
   }
 
   /**
@@ -35,10 +40,15 @@ public class ShooterSubsystem extends SubsystemBase {
     m_feedPow = feedPow;
   }
 
+  public void tunrWinch(double winchAngle) {
+    m_winchAngle = winchAngle;
+  }
+
   @Override
   public void periodic() {
     m_shooterMotor.set(m_shootPow);
     m_feederMotor.set(m_feedPow);
+    m_winchMotor.set(m_winchAngle);
     // m_shootPow = 0;
     // m_feedPow = 0;
   }

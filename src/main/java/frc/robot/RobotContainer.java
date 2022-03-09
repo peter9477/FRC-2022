@@ -43,7 +43,7 @@ public class RobotContainer {
     Digital.RIGHT_ENCODER_1, Digital.RIGHT_ENCODER_2
   );
 
-  private ShooterSubsystem m_shooter = new ShooterSubsystem(CAN.SHOOT_MOTOR, CAN.FEED_MOTOR);
+  private ShooterSubsystem m_shooter = new ShooterSubsystem(CAN.SHOOT_MOTOR, CAN.FEED_MOTOR, CAN.WINCH_MOTOR);
 
   private XboxController m_xboxController = new XboxController(Controllers.XBOX);
   private Joystick m_flightStick = new Joystick(Controllers.FLIGHT);
