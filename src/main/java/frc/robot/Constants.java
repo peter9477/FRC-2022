@@ -32,6 +32,7 @@ public final class Constants {
         // public static final int WHEEL_MOTOR = 6;
         public static final int SHOOT_MOTOR = 5;
         public static final int FEED_MOTOR = 6;
+        public static final int m_winchMotor = 7;
     }
 
     // Information on digital pins on RoboRio
@@ -47,5 +48,6 @@ public final class Constants {
         public final static double ENCODER_PULSES_PER_REVOLUTION = 360;
         public final static double WHEEL_DIAMETER = 6;
         public final static double DISTANCE_PER_ENCODER_PULSE = WHEEL_DIAMETER * Math.PI / ENCODER_PULSES_PER_REVOLUTION;
+
     }
 }
