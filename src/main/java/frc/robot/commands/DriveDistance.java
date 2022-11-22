@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import frc.robot.subsystems.DrivebaseSubsystem;
@@ -12,24 +13,21 @@ public class DriveDistance extends CommandBase {
 
   private DrivebaseSubsystem m_drivebase;
 
-  private double m_distance;
-  private double m_speed;
-  
+  private NetworkTableEntry m_distance;
+  private NetworkTableEntry m_speed;
   /**
    * A command that spins the wheels for a certain distance
    * @param subsystem Set this to m_drivebase
    * @param distance Set to distance in inches
-   * @param speed Set to speed from zero to one
-  
+   * @param speed Set to speed from -1 to 1 (must match sign of distance)
    */
-  public DriveDistance(DrivebaseSubsystem subsystem, double distance, double speed) {
+  public DriveDistance(DrivebaseSubsystem subsystem, NetworkTableEntry distance, NetworkTableEntry speed) {
 
     m_drivebase = subsystem;
     m_distance = distance;
     m_speed = speed;
 
     addRequirements(m_drivebase);
-
   }
 
 
@@ -42,7 +40,7 @@ public class DriveDistance extends CommandBase {
   @Override
   public void execute() {
     // Sets the drivebase to go forward from the speed variable
-    m_drivebase.set(0, m_speed);
+    m_drivebase.set(0, m_speed.getDouble(0.5));
   }
 
 
@@ -51,20 +49,17 @@ public class DriveDistance extends CommandBase {
     // This takes the values from encoder L and R and averages them out
     double averageDistance = (m_drivebase.getLDistance() + m_drivebase.getRDistance()) / 2; 
     // This will say to end when the encoders are equal with the distance we want
-    if (m_speed < 0) {
-      System.out.println("less than 0");
-      System.out.println(m_distance);
-      System.out.println(averageDistance);
-      return averageDistance <= m_distance;
-    } 
-    System.out.println("Triggered after 0");
-    return averageDistance >= m_distance;  
+
+    if (m_speed.getDouble(0.5) < 0) {
+      return averageDistance <= m_distance.getDouble(50);
+    } else {
+      return averageDistance >= m_distance.getDouble(50);  
+    }
   }
 
   @Override
   public void end(boolean cancelled) {
-    m_drivebase.set(0,0); // Resets the drivebase to 0
-    System.out.println("Ended Drive distance");
+    m_drivebase.set(0,0); // Resets the drivebase to 0, ends command
   }
 
 }

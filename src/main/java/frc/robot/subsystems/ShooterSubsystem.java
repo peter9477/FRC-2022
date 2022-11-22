@@ -5,41 +5,75 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ShooterSubsystem extends SubsystemBase {
-  private final CANSparkMax m_shooterMotor;
-  private final CANSparkMax m_feederMotor;
+import edu.wpi.first.wpilibj.DigitalInput;
 
-  private double m_shootPow = 0;
-  private double m_feedPow = 0;
+public class ShooterSubsystem extends SubsystemBase {
+  CANSparkMax m_indexer;
+  MotorControllerGroup m_flywheel;
+
+  private double m_flywheelPow = 0;
+  private double m_indexerPow = 0; 
+
+  private DigitalInput m_track_limit_switch;
+  private boolean m_shootStatus = false;
 
   /** Creates a new ShooterSubsystem. */
-  public ShooterSubsystem(int shooterMotor, int feederMotor) {
-    m_shooterMotor = new CANSparkMax(shooterMotor, MotorType.kBrushless);
+  public ShooterSubsystem(
+    int indexMotor,
+    int flywheelMotor, int flywheelMotor2,
+    DigitalInput track_limit_switch
+  ) {
+    m_indexer = new CANSparkMax(indexMotor, MotorType.kBrushed);
+    m_indexer.setIdleMode(IdleMode.kBrake);
 
-    m_feederMotor = new CANSparkMax(feederMotor, MotorType.kBrushless);
+    m_indexer.setInverted(true); 	
+
+    CANSparkMax flywheel1 = new CANSparkMax(flywheelMotor, MotorType.kBrushless);
+    CANSparkMax flywheel2 = new CANSparkMax(flywheelMotor2, MotorType.kBrushless);
+    m_flywheel = new MotorControllerGroup(flywheel1, flywheel2);
+
+    m_track_limit_switch = track_limit_switch;
   }
 
   /**
    * Spins the shooter wheel at a specified power level.
    * @param shootPow Speed to spin the wheel. -1 is full backwards, 1 is full forwards.
    */
-  public void spinShooter(double shootPow) {
-    m_shootPow = shootPow;
+  public void spinFlywheel(double shootPow) {
+    m_flywheelPow = shootPow;
   }
 
-  public void spinFeeder(double feedPow) {
-    m_feedPow = feedPow;
+  /**
+   * Spins the index wheel at a specified power level.
+   * @param indexPow Speed to spin the wheel. -1 is full backwards, 1 is full forwards.
+   */
+  public void spinIndex(double indexPow) {
+    m_indexerPow = indexPow;
+  }
+
+  public void setShootStatus(boolean shootStatus) {
+    m_shootStatus = shootStatus;
+  }
+
+  public boolean getShootStatus() {
+    return m_shootStatus;
   }
 
   @Override
   public void periodic() {
-    m_shooterMotor.set(m_shootPow);
-    m_feederMotor.set(m_feedPow);
-    // m_shootPow = 0;
-    // m_feedPow = 0;
+    // TODO Find proper speed for getting ball away from flywheel
+    if(!m_shootStatus && !m_track_limit_switch.get()) {
+      m_indexer.set(.2);
+    } else {
+      m_indexer.set(m_indexerPow);
+    }
+
+    m_flywheel.set(m_flywheelPow);
   }
 }
